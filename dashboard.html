@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Bear Banking - Dashboard</title>
+        <link rel="stylesheet" href="styles.css"/>
+    </head>
+    <body>
+        <div class="backButton">
+                <button onclick="logout()">Log Out</button>
+        </div>
+        <div class="panel2">
+            <h1>Dashboard</h1>
+            <h2 id="title">Welcome to your Bear Banking dashboard!</h2>
+        </div>
+        <div id="buttons">
+            <button class="dashboardButton" onclick="setIncome()">Set Income</button>
+            <button class="dashboardButton">Add Transaction</button>
+        </div>
+        <div id="main">
+            <div class="box">
+                <p class="title">Balance:</p>
+                <p style="text-align: left; font-size: x-large; color: #efe9e9;" id="balance">$0.00</p>
+            </div>
+            <div class="box">
+                <p class="title">Total Income:</p>
+                <p style="text-align: left; font-size: x-large; color: lightgreen;" id="income">+$0.00</p>
+            </div>
+            <div class="box">
+                <p class="title">Total Expenses:</p>
+                <p style="text-align: left; font-size: x-large; color: red;" id="expenses">-$0.00</p>
+            </div>
+        </div>
+        <div class="transactionsDiv">
+            <p class="title">Transactions:</p>
+            <div class="transactions"><p>#1</p></div>
+            <div class="transactions"><p>#2</p></div>
+            <div class="transactions"><p>#3</p></div>
+            <div class="transactions"><p>#4</p></div>
+            <div class="transactions"><p>#5</p></div>
+        </div>
+	<script>
+	
+	    const username = sessionStorage.getItem("currentUser");
+
+	    function logout() {
+	        window.location.replace('index.html');
+	    }
+        
+            async function loadIncome() {
+		console.log(username);
+
+	        const res = await fetch(`http://localhost:3000/get-income?username=${username}`);
+		if (!res.ok) {
+		    throw new Error(`HTTP error! status: ${res.status}`);
+		}
+
+		const data = await res.json();
+
+		const income = data.income;
+		document.getElementById("income").innerHTML = `+$${income}`;
+		console.log(income)
+		    
+		const expenses = data.expenses;
+		document.getElementById("expenses").innerHTML = `-$${expenses}`;
+		console.log(expenses)
+
+		let balance = parseFloat(income) - parseFloat(expenses);
+		document.getElementById("balance").innerHTML = `$${balance}`;
+		console.log(balance)
+
+	    }       
+	    loadIncome();
+
+	    function setIncome() {
+		window.location.href="setIncome.html"
+	    }
+
+	    async function loadName() {
+		const resp = await fetch("http://localhost:3000/users");
+		const users = await resp.json();
+
+		const currentUser = users.find(user => user.username === username);
+
+		let name = currentUser.nameFirst;
+		console.log(name);
+		document.getElementById("title").innerHTML = `${name}, Welcome to your Bear Banking dashboard!`
+	    }
+            loadName();
+
+	</script>
+    </body>
+</html>

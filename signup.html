@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Bear Banking - Signup</title>
+        <link rel="stylesheet" href="styles.css"/>
+    </head>
+    <body>
+        <div class="panel">
+            <div class="backButton">
+                <button onclick="history.back()">Back</button>
+            </div>
+            <h1>Create an account</h1>
+            <h2>Sign up for Bear Banking</h2>
+
+	    <form id="userForm">
+                <!-- First and Last name on the same row, smaller inputs -->
+                <div class="row two-columns">
+                    <div class="name-group">
+                        <label for="firstName" class="fontStyle">First Name :</label>
+                        <input type="text" id="firstName" name="firstName" placeholder="first name" required class="small-input" />
+                    </div>
+                    <div class="name-group">
+                        <label for="lastName" class="fontStyle">Last Name :</label>
+                        <input type="text" id="lastName" name="lastName" placeholder="last name" required class="small-input" />
+                    </div>
+                </div>
+                <div class="row centered">
+                    <label for="username" class="fontStyle">Username :</label>
+                    <input type="text" id="username" name="username" placeholder="choose a username" required />
+                </div>
+
+                <div class="row centered">
+                    <label for="password" class="fontStyle">Password :</label>
+                    <input type="password" id="password" name="password" placeholder="choose a password" required />
+                </div>
+
+                <div class="row centered">
+                    <label for="confirm" class="fontStyle">Confirm :</label>
+                    <input type="password" id="confirm" name="confirm" placeholder="confirm password" required />
+                </div>
+
+                <div class="bottom-center">
+                    <button id="submit" type="submit">Sign Up</button>
+                </div>
+            </form>
+        </div>
+    <script>
+	const form = document.getElementById("userForm");
+
+	form.addEventListener("submit", async (e) => {
+		e.preventDefault();
+		const nameFirst = document.getElementById("firstName").value;
+		const nameLast = document.getElementById("lastName").value;
+		const username = document.getElementById("username").value;
+		const password = document.getElementById("password").value;
+		const confirm = document.getElementById("confirm").value;
+
+		if (password != confirm) {
+			alert("Passwords do not match");
+			document.getElementById("password").value = "";
+			document.getElementById("confirm").value = "";
+			return;
+		}
+
+		const response = await fetch ("http://localhost:3000/users", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ nameFirst, nameLast, username, password })
+		});
+
+		if (!response.ok) {
+			const error = await response.json();
+			alert(error.error || "Failed to Create Account");
+			document.getElementById("firstName").value = "";
+			document.getElementById("lastName").value = "";
+			document.getElementById("username").value = "";
+			document.getElementById("password").value = "";
+			document.getElementById("confirm").value = "";
+			return;
+		}
+
+		document.getElementById("submit").innerText = "Creating Account..."
+		setTimeout(() => {
+			    sessionStorage.setItem("currentUser", username);	
+			    window.location.href = "dashboard.html";
+		},2000);
+	});
+    </script>
+    </body>
+</html>

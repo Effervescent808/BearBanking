@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Bear Banking</title>
+        <link rel="stylesheet" href="styles.css"/>
+    </head>
+    <body>
+        <div class="panel">
+            <h1>Welcome to Bear Banking!</h1>
+            <h2>Please enter your login information :</h2>
+
+            <form id="loginForm"  method="post">
+                <div class="row centered">
+                    <label for="username" class="fontStyle">Username :</label>
+                    <input type="text" id="username" name="username" placeholder="enter username" required />
+                </div>
+
+                <div class="row centered">
+                    <label for="password" class="fontStyle">Password :</label>
+                    <input type="password" id="password" name="password" placeholder="enter password" required />
+                </div>
+                <div class="row centered">
+                    <label for="signup" class="fontStyle">New user? </label>
+                    <a href="signup.html" class="fontStyle">Sign up here!</a>
+                </div>
+
+                <div class="bottom-center">
+                    <!-- Use a button that calls the form by id, submits it, then navigates to the dashboard. -->
+                    <button type="button" id="login">Log In</button>
+                </div>
+            </form>
+        </div>
+    <script>
+
+	document.getElementById("login").addEventListener("click", async (e) => {
+		e.preventDefault();
+
+		const username = document.getElementById("username").value;
+		const password = document.getElementById("password").value;
+		const res = await fetch("http://localhost:3000/users");
+		const users = await res.json();
+
+		let userFound = false;
+
+		users.forEach(u => {
+		    if (u.username == username) {
+			userFound = true;
+			if (u.password == password) {
+			    sessionStorage.setItem("currentUser", username);
+			    window.location.href = "dashboard.html";
+			} else {
+			    alert("Wrong Password");
+			    document.getElementById("password").value = "";
+	    
+			}
+		    }
+		});
+
+		if (!userFound) {
+		    alert("Account not found");
+		    document.getElementById("username").value = "";
+		    document.getElementById("password").value = "";
+		}
+	});
+    </script>
+    </body>
+</html>

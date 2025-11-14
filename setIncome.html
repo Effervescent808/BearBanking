@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<head>
+        <link rel="stylesheet" href="styles.css"/>
+        <title>Bear Banking - Income</title>
+</head>
+<html>
+    <body>
+        <div style="padding:5%">
+            <h1>Set Income</h1>
+        </div>
+        <div id="incomeDiv">
+            <label for="income" style="text-decoration: underline;">Income:</label>
+            <input type="number" placeholder="0" id="income"><br><br>
+            <button id="submit" type="submit" class="dashboardButton">Submit</button>
+        </div>
+    <script>
+        const username = sessionStorage.getItem("currentUser");
+        console.log(username)
+
+        document.getElementById("submit").addEventListener("click", async (e) => {
+		    e.preventDefault();
+            const income = document.getElementById("income").value;
+            console.log(income)
+
+            const response = await fetch ("http://localhost:3000/set-income", {
+			    method: "POST",
+			    headers: { "Content-Type": "application/json" },
+			    body: JSON.stringify({ username, income })
+		    });
+
+            if (!response.ok){
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            document.getElementById("submit").innerText = "Setting Income..."
+            setTimeout(() => {window.location.href="dashboard.html"}, 1500)
+        });
+    </script>
+    </body>
+</html>
