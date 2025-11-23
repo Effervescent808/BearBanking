@@ -15,7 +15,8 @@
         </div>
         <div id="buttons">
             <button class="dashboardButton" onclick="setIncome()">Set Income</button>
-            <button class="dashboardButton">Add Transaction</button>
+            <button class="dashboardButton" onclick="addTransaction()">Add Transaction</button>
+	    <button class="dashboardButton" onclick="seeTransactions()">View Transactions</button>
         </div>
         <div id="main">
             <div class="box">
@@ -24,7 +25,7 @@
             </div>
             <div class="box">
                 <p class="title">Total Income:</p>
-                <p style="text-align: left; font-size: x-large; color: lightgreen;" id="income">+$0.00</p>
+				<p style="text-align: left; font-size: x-large; color: lightgreen;" id="income">+$0.00 <span style="font-size:x-small;" id="small"></span></p>
             </div>
             <div class="box">
                 <p class="title">Total Expenses:</p>
@@ -32,51 +33,106 @@
             </div>
         </div>
         <div class="transactionsDiv">
-            <p class="title">Transactions:</p>
-            <div class="transactions"><p>#1</p></div>
-            <div class="transactions"><p>#2</p></div>
-            <div class="transactions"><p>#3</p></div>
-            <div class="transactions"><p>#4</p></div>
-            <div class="transactions"><p>#5</p></div>
+            <p class="title">5 Recent Transactions:</p>
+            <div class="transactions" id="trans1">
+				<p id="number1" class="transPara">#1</p>
+				<p id="desc1" style="font-size: small; margin-left:1%;"></p>
+			</div>
+            <div class="transactions" id="trans2" hidden>
+				<p id="number2" class="transPara">#2</p>
+				<p id="desc2" style="font-size: small; margin-left:1%;"></p>
+			</div>
+            <div class="transactions" id="trans3" hidden>
+				<p id="number3" class="transPara">#3</p>
+				<p id="desc3" style="font-size: small; margin-left:1%;"></p>
+			</div>
+            <div class="transactions" id="trans4" hidden>
+				<p id="number4" class="transPara">#4</p>
+				<p id="desc4" style="font-size: small; margin-left:1%;"></p>
+			</div>
+            <div class="transactions" id="trans5" hidden>
+				<p id="number5" class="transPara">#5</p>
+				<p id="desc5" style="font-size: small; margin-left:1%;"></p>
+			</div>
         </div>
 	<script>
 	
-	    const username = sessionStorage.getItem("currentUser");
+	const username = sessionStorage.getItem("currentUser");
 
-	    function logout() {
+
+	function logout() {
 	        window.location.replace('index.html');
 	    }
         
-            async function loadIncome() {
+        async function loadIncome() {
 		console.log(username);
 
-	        const res = await fetch(`http://localhost:3000/get-income?username=${username}`);
-		if (!res.ok) {
-		    throw new Error(`HTTP error! status: ${res.status}`);
+		const id_res = await fetch("http://localhost:3000/users");
+		const users = await id_res.json();
+
+		users.forEach(u => {
+			if (u.username == username) {
+			    	sessionStorage.setItem("currentUser_id",u.id);
+			    }
+		});
+
+		const user_id = sessionStorage.getItem("currentUser_id");
+		console.log(user_id);
+
+	        const res = await fetch(`http://localhost:3000/get-finance?user_id=${user_id}`);
+			if (!res.ok) { 
+				throw new Error(`HTTP error! status: ${res.status}`);
 		}
 
+		const incomeRes = await fetch("http://localhost:3000/users");
+
 		const data = await res.json();
+		const incomeData = await incomeRes.json();
 
-		const income = data.income;
-		document.getElementById("income").innerHTML = `+$${income}`;
-		console.log(income)
-		    
-		const expenses = data.expenses;
-		document.getElementById("expenses").innerHTML = `-$${expenses}`;
-		console.log(expenses)
+		let income1 = 0;
+		incomeData.forEach(e => {
+			if (username === e.username){
+				income1 = e.income;
+			}
+		});
 
-		let balance = parseFloat(income) - parseFloat(expenses);
-		document.getElementById("balance").innerHTML = `$${balance}`;
+		const income2 = data.filter(r => r.category === "income");
+
+		let incomeTotal = 0
+		income2.forEach(j => {
+			incomeTotal = incomeTotal + parseFloat(j.amount);
+		});
+
+		let income = parseFloat(income1) + incomeTotal
+		console.log(income1);
+		console.log(incomeTotal);
+		console.log(income);
+
+		document.getElementById("income").innerHTML = `+$${income.toFixed(2)} <span style="font-size:small;">($${income1.toFixed(2)} monthly)</span>`;
+		const expenses = data.filter(r => r.category === "expense");
+
+		let expensesTotal = 0
+		expenses.forEach(l => {
+			expensesTotal = expensesTotal + parseFloat(l.amount);
+		});
+		console.log(expensesTotal)
+		document.getElementById("expenses").innerHTML = `-$${expensesTotal.toFixed(2)}`
+        
+		let balance = income - expensesTotal;
+		document.getElementById("balance").innerHTML = `$${balance.toFixed(2)}`;
 		console.log(balance)
 
-	    }       
-	    loadIncome();
+	}       
 
-	    function setIncome() {
+	function setIncome() {
 		window.location.href="setIncome.html"
-	    }
+	}
 
-	    async function loadName() {
+    function addTransaction() {
+        window.location.href="transactions.html"
+    }
+
+	async function loadName() {
 		const resp = await fetch("http://localhost:3000/users");
 		const users = await resp.json();
 
@@ -86,8 +142,49 @@
 		console.log(name);
 		document.getElementById("title").innerHTML = `${name}, Welcome to your Bear Banking dashboard!`
 	    }
-            loadName();
+	
+	// ADD DISPLAY FOR MOST RECENT 5 TRANSACTIONS
+	// ADD PAGE FOR SHOWING ALL TRANSACTIONS
+	// CHECK FOR IF LESS THAN 5? - MAYBE NEEDED
 
+	async function loadTransactions() {
+
+		const user_id = sessionStorage.getItem("currentUser_id");
+	    const respo = await fetch(`http://localhost:3000/dashboard-finance?user_id=${user_id}`);
+		const transactions = await respo.json();	
+
+		if (transactions.length === 0) {
+			document.getElementById("number1").innerHTML = "No Transactions Found"
+			return;
+		}
+		
+		let count = 1
+		transactions.forEach(t => {
+			if (t.category === "expense"){
+				document.getElementById(`number${count}`).style.color = "#FF0000"
+				document.getElementById(`number${count}`).innerHTML = `-$${t.amount}`;
+			} else {
+				document.getElementById(`number${count}`).style.color = "lightgreen"
+				document.getElementById(`number${count}`).innerHTML = `$${t.amount}`;
+			}
+
+			document.getElementById(`desc${count}`).innerHTML = t.description;
+			document.getElementById(`trans${count}`).hidden = false;
+			count = count + 1;
+		});
+	}
+
+	function seeTransactions() {
+		window.location.href = "transactionsPage.html";
+	}
+
+	async function startDashboard() {
+		await loadIncome();
+		await loadTransactions();
+	}
+
+	startDashboard();
+	loadName();
 	</script>
     </body>
 </html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Bear Banking - Transactions</title>
+        <link rel="stylesheet" href="styles.css"/>
+    </head>
+    <body>
+        <div class="backButton">
+                <button onclick="history.back()">Back</button>
+        </div>
+        <h1>Transactions</h1>
+            <div class="transactionsDiv" id="transactionsDiv">
+        </div>
+    </body>
+    <script>
+        const user_id = sessionStorage.getItem("currentUser_id");
+
+        async function loadTransactions() {
+            const respo = await fetch(`http://localhost:3000/get-finance?user_id=${user_id}`);
+	    const transactions = await respo.json();
+
+	
+	    if (transactions.length === 0) {
+                const newDiv = document.createElement('div');
+                const newParagraph = document.createElement('p');
+                newDiv.classList.add("transactions");
+                newParagraph.innerHTML = "No Transactions Found";
+                newDiv.appendChild(newParagraph);
+                document.getElementById("transactionsDiv").appendChild(newDiv);
+                return;
+            }
+
+            transactions.forEach(t => {
+                const newDiv = document.createElement('div');
+                const newParagraph = document.createElement('p');
+                const newParagraphSmall = document.createElement('p');
+                newDiv.classList.add("transactions")
+
+		    if (t.category === "expense"){
+			newParagraph.style.color = "red"
+			newParagraph.innerHTML = `-$${t.amount}`;
+		    } else {
+			newParagraph.style.color = "lightgreen"
+			newParagraph.innerHTML = `$${t.amount}`;
+		    }
+
+		newParagraphSmall.innerHTML = t.description;
+
+                document.getElementById("transactionsDiv").appendChild(newDiv);
+		newDiv.appendChild(newParagraph);
+		newDiv.appendChild(newParagraphSmall);
+
+            });
+        }
+	loadTransactions();
+    </script>
+</html>

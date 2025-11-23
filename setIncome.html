@@ -5,17 +5,21 @@
 </head>
 <html>
     <body>
+        <div class="backButton">
+                <button onclick="history.back()">Back</button>
+        </div>
         <div style="padding:5%">
             <h1>Set Income</h1>
         </div>
         <div id="incomeDiv">
             <label for="income" style="text-decoration: underline;">Income:</label>
-            <input type="number" placeholder="0" id="income"><br><br>
+            <input type="number" placeholder="0" id="income" class="income"><br><br>
             <button id="submit" type="submit" class="dashboardButton">Submit</button>
         </div>
     <script>
-        const username = sessionStorage.getItem("currentUser");
-        console.log(username)
+        const user_id = sessionStorage.getItem("currentUser_id");
+    
+        console.log(user_id)
 
         document.getElementById("submit").addEventListener("click", async (e) => {
 		    e.preventDefault();
@@ -25,7 +29,7 @@
             const response = await fetch ("http://localhost:3000/set-income", {
 			    method: "POST",
 			    headers: { "Content-Type": "application/json" },
-			    body: JSON.stringify({ username, income })
+			    body: JSON.stringify({ user_id, income })
 		    });
 
             if (!response.ok){

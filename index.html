@@ -26,9 +26,9 @@
                 </div>
 
                 <div class="bottom-center">
-                    <!-- Use a button that calls the form by id, submits it, then navigates to the dashboard. -->
                     <button type="button" id="login">Log In</button>
                 </div>
+                <img src="bear.png" style="position: absolute; right: 0; bottom: 0;">
             </form>
         </div>
     <script>
@@ -48,7 +48,9 @@
 			userFound = true;
 			if (u.password == password) {
 			    sessionStorage.setItem("currentUser", username);
-			    window.location.href = "dashboard.html";
+                            sessionStorage.setItem("currentUser_id", u.id)
+			    setTimeout(() => {window.location.href = "dashboard.html"},1500);
+			    document.getElementById("login").innerText = "Logging In..."
 			} else {
 			    alert("Wrong Password");
 			    document.getElementById("password").value = "";
