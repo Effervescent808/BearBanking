@@ -1,0 +1,9 @@
+services:
+  dashboard-web:
+    container_name: dashboard-web
+    image: dashboard
+    build: .
+    volumes: 
+      - "./CS100 - Dashboard:/dashboard"
+    ports:
+      - "3000:3000"
