@@ -38,7 +38,7 @@
 
 		const username = document.getElementById("username").value;
 		const password = document.getElementById("password").value;
-		const res = await fetch("http://localhost:3000/users");
+		const res = await fetch("/users");
 		const users = await res.json();
 
 		let userFound = false;
