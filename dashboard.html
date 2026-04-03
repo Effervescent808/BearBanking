@@ -67,7 +67,7 @@
         async function loadIncome() {
 		console.log(username);
 
-		const id_res = await fetch("http://localhost:3000/users");
+		const id_res = await fetch("/users");
 		const users = await id_res.json();
 
 		users.forEach(u => {
@@ -80,12 +80,12 @@
 		console.log(user_id);
 
 		const selection = "All";
-		const res = await fetch(`http://localhost:3000/get-finance?user_id=${user_id}&selection=${selection}`);
+		const res = await fetch(`/get-finance?user_id=${user_id}&selection=${selection}`);
 			if (!res.ok) { 
 				throw new Error(`HTTP error! status: ${res.status}`);
 		}
 
-		const incomeRes = await fetch("http://localhost:3000/users");
+		const incomeRes = await fetch("/users");
 
 		const data = await res.json();
 		console.log(data);
@@ -136,7 +136,7 @@
     }
 
 	async function loadName() {
-		const resp = await fetch("http://localhost:3000/users");
+		const resp = await fetch("/users");
 		const users = await resp.json();
 
 		const currentUser = users.find(user => user.username === username);
@@ -148,7 +148,7 @@
 	
 	async function loadTransactions() {
 		const user_id = sessionStorage.getItem("currentUser_id");
-	    	const respo = await fetch(`http://localhost:3000/dashboard-finance?user_id=${user_id}`);
+	    	const respo = await fetch(`/dashboard-finance?user_id=${user_id}`);
 		const transactions = await respo.json();	
 		console.log(user_id)
 		console.log(transactions);
