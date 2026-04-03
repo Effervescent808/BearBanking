@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Local DB Example</title>
+</head>
+<body>
+  <h1>Local HTML + SQLite Example</h1>
+
+  <form id="userForm">
+    <input id="nameInput" placeholder="Enter name" required><br>
+    <input id="emailInput" placeholder="Enter email" required><br>
+    <button id="addButton" type="submit" style="margin-left:60px; margin-top:5px;">Add User</button>
+  </form>
+
+  <ol id="userList"></ol>
+
+  <script>
+    const form = document.getElementById("userForm");
+    const list = document.getElementById("userList");
+
+    async function loadUsers() {
+      const res = await fetch("http://localhost:3000/users");
+      const users = await res.json();
+      list.innerHTML = "";
+      users.forEach(u => {
+	  const li = document.createElement("li");
+	  li.textContent = `${u.name}, ${u.email} `;
+	  const deleteBtn = document.createElement("button");
+	  deleteBtn.textContent = "Delete";
+	  deleteBtn.onclick = async () => {
+	    await fetch("http://localhost:3000/delete-user", {
+	      method: "POST",
+	      headers: { "Content-Type": "application/json" },
+	      body: JSON.stringify({ id: u.id })
+	    });
+	    loadUsers();
+	  };
+	  li.appendChild(deleteBtn);
+	  list.appendChild(li);
+	});
+    }
+
+    document.getElementById("addButton").addEventListener("click", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("nameInput").value;
+      const email = document.getElementById("emailInput").value;
+      await fetch("http://localhost:3000/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email })
+      });
+      document.getElementById("nameInput").value = "";
+      document.getElementById("emailInput").value = "";
+      loadUsers();
+    });
+
+    loadUsers();
+  </script>
+</body>
+</html>
+

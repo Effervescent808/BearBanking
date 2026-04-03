@@ -9,18 +9,34 @@
                 <button onclick="history.back()">Back</button>
         </div>
         <h1>Transactions</h1>
-            <div class="transactionsDiv" id="transactionsDiv">
-        </div>
+	<div id="filterDiv" style="text-align: center;">
+		<label for="filter" class="fontStyle">Filter:</label><br>
+		<select id="filter" class="transinput">
+			<option value="All" selected>All</option>
+			<option value="income">Income</option>
+			<option value="expense">Expenses</option>
+		</select>
+		<button type="submit" onclick="loadTransactions()">Apply</button>
+	</div>
+        <div class="transactionsDiv" id="transactionsDiv"></div>
     </body>
     <script>
         const user_id = sessionStorage.getItem("currentUser_id");
+	console.log(user_id);
 
         async function loadTransactions() {
-            const respo = await fetch(`http://localhost:3000/get-finance?user_id=${user_id}`);
-	    const transactions = await respo.json();
+		let children = document.getElementById("transactionsDiv").querySelectorAll("div");
+		children.forEach(div => {
+			div.remove();
+		});
+
+        	const selection=document.getElementById('filter').value;
+		console.log(selection);
+        	const respo = await fetch(`http://localhost:3000/get-finance?user_id=${user_id}&selection=${selection}`);
+	        const transactions = await respo.json();
 
 	
-	    if (transactions.length === 0) {
+	        if (transactions.length === 0) {
                 const newDiv = document.createElement('div');
                 const newParagraph = document.createElement('p');
                 newDiv.classList.add("transactions");

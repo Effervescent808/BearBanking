@@ -79,7 +79,8 @@
 		const user_id = sessionStorage.getItem("currentUser_id");
 		console.log(user_id);
 
-	        const res = await fetch(`http://localhost:3000/get-finance?user_id=${user_id}`);
+		const selection = "All";
+		const res = await fetch(`http://localhost:3000/get-finance?user_id=${user_id}&selection=${selection}`);
 			if (!res.ok) { 
 				throw new Error(`HTTP error! status: ${res.status}`);
 		}
@@ -87,6 +88,7 @@
 		const incomeRes = await fetch("http://localhost:3000/users");
 
 		const data = await res.json();
+		console.log(data);
 		const incomeData = await incomeRes.json();
 
 		let income1 = 0;
@@ -113,6 +115,7 @@
 
 		let expensesTotal = 0
 		expenses.forEach(l => {
+			console.log(l.description);
 			expensesTotal = expensesTotal + parseFloat(l.amount);
 		});
 		console.log(expensesTotal)
@@ -143,15 +146,12 @@
 		document.getElementById("title").innerHTML = `${name}, Welcome to your Bear Banking dashboard!`
 	    }
 	
-	// ADD DISPLAY FOR MOST RECENT 5 TRANSACTIONS
-	// ADD PAGE FOR SHOWING ALL TRANSACTIONS
-	// CHECK FOR IF LESS THAN 5? - MAYBE NEEDED
-
 	async function loadTransactions() {
-
 		const user_id = sessionStorage.getItem("currentUser_id");
-	    const respo = await fetch(`http://localhost:3000/dashboard-finance?user_id=${user_id}`);
+	    	const respo = await fetch(`http://localhost:3000/dashboard-finance?user_id=${user_id}`);
 		const transactions = await respo.json();	
+		console.log(user_id)
+		console.log(transactions);
 
 		if (transactions.length === 0) {
 			document.getElementById("number1").innerHTML = "No Transactions Found"

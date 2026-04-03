@@ -59,13 +59,14 @@ async function startServer() {
 
   // GET ALL FINANCE ENTRIES THAT CONTAIN THE SAME USER_ID
   app.get("/get-finance", async (req, res) => {
-    const { user_id } = req.query;
+    const { user_id, selection } = req.query;
 
     if (!user_id) {
         return res.status(400).json({ error: 'User is required' });
       }
 
-    const income = await db.all("SELECT * FROM finance WHERE user_id = ? ORDER BY timestamp DESC", [user_id]);
+	// ALL FILTER IS NOT WORKING - I THINK ITS THE DOUBLE ?
+    const income = await db.all("SELECT * FROM finance WHERE user_id = ? AND (category = ? OR ? = 'All') ORDER BY timestamp DESC", [user_id, selection, selection]);
     res.json(income || null)
   });
   // GET FINANCE ENTIRES, BUT ONLY 5 MOST RECENT FROM DASHBOARD
