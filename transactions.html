@@ -37,7 +37,7 @@
 		const category=document.getElementById("type").value;
 		const amount=document.getElementById("amount").value;
 
-		const response = await fetch ("http://localhost:3000/add-transaction", {
+		const response = await fetch ("/add-transaction", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ user_id, amount, category, description })

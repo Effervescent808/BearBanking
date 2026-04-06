@@ -32,7 +32,7 @@
 
         	const selection=document.getElementById('filter').value;
 		console.log(selection);
-        	const respo = await fetch(`http://localhost:3000/get-finance?user_id=${user_id}&selection=${selection}`);
+        	const respo = await fetch(`/get-finance?user_id=${user_id}&selection=${selection}`);
 	        const transactions = await respo.json();
 
 	
